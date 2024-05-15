@@ -1,0 +1,10 @@
+version: '3'
+services:
+  movies-app:
+    build:
+        context: .
+        target : test
+    environment:
+      - NODE_ENV=test
+    command: npm test
+

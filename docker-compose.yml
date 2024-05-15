@@ -1,0 +1,39 @@
+version: '3'
+services:
+  movies-app:
+    container_name: movies-app-container
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./config/.env
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - mongo-db:/data/db
+
+  mongo-import:
+    image: mongo
+    depends_on:
+      - mongo
+    volumes:
+      - ./movies.csv:/tmp/movies.csv  
+    command: mongoimport --host mongo --db movies-app --collection movies --type csv --file /tmp/movies.csv --headerline
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/movies-app
+      ME_CONFIG_BASICAUTH: false
+    depends_on:
+      - mongo
+
+
+volumes:
+  mongo-db:
